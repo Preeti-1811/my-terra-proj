@@ -1,0 +1,12 @@
+services:
+  backend:
+    build: ./backend
+    image: my-terra-proj-backend:latest
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    image: my-terra-proj-frontend:latest
+    ports:
+      - "8080:80"

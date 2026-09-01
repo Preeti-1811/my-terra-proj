@@ -1,0 +1,76 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  margin: 0;
+  background: #f4f4f4;
+}
+
+.container {
+  max-width: 500px;
+  width: 100%;
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h1 { text-align: center; margin-bottom: 24px; }
+h2 { font-size: 16px; margin: 20px 0 10px; }
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.option-btn {
+  padding: 10px 16px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.option-btn.selected {
+  border-color: #333;
+  background: #333;
+  color: white;
+}
+
+#placeOrder {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+#placeOrder:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+#orderStatus {
+  margin-top: 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.orders-section {
+  margin-top: 32px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.order-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}

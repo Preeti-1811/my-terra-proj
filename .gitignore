@@ -1,0 +1,13 @@
+@"
+node_modules/
+.env
+.env.*
+!.env.example
+
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+*.log
+"@ | Out-File -Encoding utf8 .gitignore
