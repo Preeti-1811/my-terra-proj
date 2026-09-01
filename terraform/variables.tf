@@ -17,3 +17,15 @@ variable "private_subnet_cidrs" {
 variable "azs" {
   default = ["us-east-1a", "us-east-1b"]
 }
+
+variable "backend_image_tag" {
+  description = "Docker image tag for the backend"
+  type        = string
+  default     = "latest"
+}
+
+variable "frontend_image_tag" {
+  description = "Docker image tag for the frontend"
+  type        = string
+  default     = "latest"
+}
