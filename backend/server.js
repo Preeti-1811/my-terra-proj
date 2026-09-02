@@ -8,12 +8,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// PostgreSQL connection pool
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: 5432,
   database: process.env.DB_NAME || 'burgerapp',
   user: process.env.DB_USER || 'burgerapp_admin',
   password: process.env.DB_PASSWORD,
+
+  // RDS PostgreSQL requires an encrypted connection
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Create tables if they don't exist yet, and seed the menu once
@@ -37,6 +43,7 @@ async function initDb() {
   `);
 
   const { rows } = await pool.query('SELECT COUNT(*) FROM menu');
+
   if (parseInt(rows[0].count) === 0) {
     await pool.query(`
       INSERT INTO menu (name, price) VALUES
@@ -48,44 +55,78 @@ async function initDb() {
   }
 }
 
+// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'backend' });
+  res.json({
+    status: 'ok',
+    service: 'backend'
+  });
 });
 
+// Get menu
 app.get('/api/menu', async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM menu ORDER BY id');
+    const { rows } = await pool.query(
+      'SELECT * FROM menu ORDER BY id'
+    );
+
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch menu' });
+    console.error('Failed to fetch menu:', err);
+    res.status(500).json({
+      error: 'Failed to fetch menu'
+    });
   }
 });
 
+// Place order
 app.post('/api/orders', async (req, res) => {
   const { burger, drink } = req.body;
+
   try {
-    const menuResult = await pool.query('SELECT name, price FROM menu WHERE name IN ($1, $2)', [burger, drink]);
-    const total = menuResult.rows.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    const menuResult = await pool.query(
+      'SELECT name, price FROM menu WHERE name IN ($1, $2)',
+      [burger, drink]
+    );
+
+    const total = menuResult.rows.reduce(
+      (sum, item) => sum + parseFloat(item.price),
+      0
+    );
 
     const { rows } = await pool.query(
-      'INSERT INTO orders (burger, drink, total) VALUES ($1, $2, $3) RETURNING *',
+      `INSERT INTO orders (burger, drink, total)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
       [burger, drink, total]
     );
+
     res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to place order' });
+    console.error('Failed to place order:', err);
+    res.status(500).json({
+      error: 'Failed to place order'
+    });
   }
 });
 
+// Get orders
 app.get('/api/orders', async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+    const { rows } = await pool.query(
+      'SELECT * FROM orders ORDER BY created_at DESC'
+    );
+
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch orders' });
+    console.error('Failed to fetch orders:', err);
+    res.status(500).json({
+      error: 'Failed to fetch orders'
+    });
   }
 });
 
+// Initialize database and start server
 initDb()
   .then(() => {
     app.listen(PORT, () => {
